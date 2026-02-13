@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-02-13T06:15:12.954Z",
+  "results": {
+    "authentication": {
+      "basic": {
+        "success": false,
+        "error": "404 page not found\n"
+      },
+      "token": null,
+      "comparison": null
+    },
+    "apiEndpoints": {
+      "textToVideo": {
+        "success": false,
+        "error": {
+          "code": 140013,
+          "msg": "unauthorized: Unauthorized",
+          "data": null
+        }
+      },
+      "imageToVideo": null,
+      "textToImage": {
+        "success": false,
+        "error": {
+          "code": 140013,
+          "msg": "unauthorized: Unauthorized",
+          "data": null
+        }
+      },
+      "textToMusic": {
+        "success": false,
+        "error": {
+          "code": 140013,
+          "msg": "unauthorized: Unauthorized",
+          "data": null
+        }
+      },
+      "taskStatus": {
+        "success": false,
+        "error": {
+          "code": 140013,
+          "msg": "unauthorized: Unauthorized",
+          "data": null
+        }
+      }
+    },
+    "mcpServer": {
+      "running": false,
+      "toolsAvailable": null,
+      "functionality": null
+    },
+    "overall": {
+      "successCount": 0,
+      "failureCount": 3,
+      "issues": [
+        "Authentication system failure",
+        "API endpoint failures",
+        "MCP server not running"
+      ],
+      "recommendations": [
+        "Verify API credentials and endpoints",
+        "Fix API endpoints and authentication method",
+        "Start MCP server for full testing"
+      ]
+    }
+  },
+  "summary": {
+    "totalTests": 3,
+    "successRate": "0.0%",
+    "issues": [
+      "Authentication system failure",
+      "API endpoint failures",
+      "MCP server not running"
+    ],
+    "recommendations": [
+      "Verify API credentials and endpoints",
+      "Fix API endpoints and authentication method",
+      "Start MCP server for full testing"
+    ]
+  }
+}

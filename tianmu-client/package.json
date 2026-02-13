@@ -1,0 +1,55 @@
+{
+  "name": "tianmu-client",
+  "version": "1.0.0",
+  "description": "天幕API客户端和MCP服务器",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node examples/client-examples.ts",
+    "dev:mcp": "ts-node examples/mcp-examples.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "mcp": "node dist/server.js",
+    "mcp:example": "ts-node examples/mcp-examples.ts",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "quick-start": "node scripts/quick-start.js",
+    "start": "npm run build && npm run mcp"
+  },
+  "keywords": [
+    "tianmu",
+    "ai",
+    "video",
+    "audio",
+    "image",
+    "mcp"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@types/form-data": "^2.2.1",
+    "axios": "^1.6.0",
+    "crypto": "^1.0.1",
+    "form-data": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "dotenv": "^17.3.1",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0"
+   }
+}

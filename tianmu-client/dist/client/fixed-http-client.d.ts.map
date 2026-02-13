@@ -1,0 +1,1 @@
+{"version":3,"file":"fixed-http-client.d.ts","sourceRoot":"","sources":["../../src/client/fixed-http-client.ts"],"names":[],"mappings":"AAKA,OAAO,EAAgB,UAAU,EAAE,SAAS,EAAE,MAAM,UAAU,CAAC;AAI/D,qBAAa,eAAe;IAC1B,OAAO,CAAC,aAAa,CAAgB;IACrC,OAAO,CAAC,MAAM,CAAa;IAC3B,OAAO,CAAC,YAAY,CAAoB;gBAE5B,MAAM,EAAE,UAAU,GAAG,SAAS;CAuD3C"}

@@ -1,0 +1,375 @@
+import { HttpClient } from './http-client';
+import {
+  VideoGenerationOptions,
+  ImageToVideoOptions,
+  VideoContinuationOptions,
+  FrameToVideoOptions,
+  TextToMusicOptions,
+  TextToSoundEffectOptions,
+  VideoSoundtrackOptions,
+  TextToSpeechOptions,
+  TextToImageOptions,
+  ImageToImageOptions,
+  ImageRedrawingOptions,
+  ImageRecognitionOptions,
+  TaskResponse,
+  TaskStatusResponse,
+  ClientConfig
+} from '../types';
+import { validateRequiredFields } from '../utils';
+
+/**
+ * 天幕API客户端
+ */
+export class TianmuClient {
+  private http: HttpClient;
+
+  constructor(config: ClientConfig) {
+    this.http = new HttpClient(config);
+  }
+
+  // ==================== 视频大模型 ====================
+
+  /**
+   * 文生视频
+   */
+  async textToVideo(options: VideoGenerationOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['prompt']);
+    
+    const payload = {
+      text: options.prompt,  // API使用text字段
+      duration: Number(options.duration) || 5,  // 确保是数字类型
+      resolution: options.resolution || '720p',
+      aspect_ratio: options.aspect_ratio || '16:9'
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/open/capacity/application/tm_text2video_b',
+      payload
+    );
+  }
+
+  /**
+   * 图生视频
+   */
+  async imageToVideo(options: ImageToVideoOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['image_url']);
+    
+    const payload = {
+      image_url: options.image_url,
+      prompt: options.prompt,
+      duration: options.duration || 5,
+      resolution: options.resolution || '720p',
+      aspect_ratio: options.aspect_ratio || '16:9',
+      camera_move_index: options.camera_move_index,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_image2video',
+      payload
+    );
+  }
+
+  /**
+   * 视频续写
+   */
+  async continueVideo(options: VideoContinuationOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['video_url']);
+    
+    const payload = {
+      video_url: options.video_url,
+      prompt: options.prompt,
+      duration: options.duration || 5,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_video_continue',
+      payload
+    );
+  }
+
+  /**
+   * 首尾帧生视频
+   */
+  async framesToVideo(options: FrameToVideoOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['start_frame_url']);
+    
+    const payload = {
+      start_frame_url: options.start_frame_url,
+      end_frame_url: options.end_frame_url,
+      prompt: options.prompt,
+      duration: options.duration || 5,
+      resolution: options.resolution || '720p',
+      aspect_ratio: options.aspect_ratio || '16:9',
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_img2video',
+      payload
+    );
+  }
+
+  // ==================== 音频大模型 ====================
+
+  /**
+   * 文生音乐
+   */
+  async textToMusic(options: TextToMusicOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['prompt']);
+    
+    const payload = {
+      prompt: options.prompt,
+      duration: options.duration || 10,
+      style: options.style,
+      mood: options.mood,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_text2music',
+      payload
+    );
+  }
+
+  /**
+   * 文生音效
+   */
+  async textToSoundEffect(options: TextToSoundEffectOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['prompt']);
+    
+    const payload = {
+      prompt: options.prompt,
+      duration: options.duration || 3,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_text2sound_effect',
+      payload
+    );
+  }
+
+  /**
+   * 视频配乐
+   */
+  async generateVideoSoundtrack(options: VideoSoundtrackOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['video_url']);
+    
+    const payload = {
+      video_url: options.video_url,
+      style: options.style,
+      mood: options.mood,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_video_soundtrack',
+      payload
+    );
+  }
+
+  /**
+   * 文字转语音
+   */
+  async textToSpeech(options: TextToSpeechOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['text']);
+    
+    const payload = {
+      text: options.text,
+      speaker_choice: options.voice_id || 'GEN_ZH_F_001',
+      speed_adjustment: options.speed || 1.0,
+      key_adjustment: options.pitch || 0,
+      loudness_adjustment: options.volume || -10,
+      emotion_choice: options.emotion || 'Neutral',
+      lang_code: 'zh-CN',
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/open/capacity/application/tm_text2speech_b',
+      payload
+    );
+  }
+
+  // ==================== 图像大模型 ====================
+
+  /**
+   * 文生图/参考生图
+   * 天幕API使用参考生图模式实现图像生成
+   */
+  async textToImage(options: TextToImageOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['prompt']);
+    
+    // 如果没有提供参考图，使用默认参考图
+    const referenceImage = options.reference_image || 'https://picsum.photos/1024/1024';
+    
+    const payload = {
+      prompt: options.prompt,
+      width: options.width || 1024,
+      height: options.height || 1024,
+      batch_size: options.batch_size || 1,
+      control_intensity: options.control_intensity ?? 0.5,
+      control_type: options.control_type || '0',
+      reference_image: referenceImage,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/open/capacity/application/tm_reference_img2img',
+      payload
+    );
+  }
+
+  /**
+   * 参考生图
+   */
+  async imageToImage(options: ImageToImageOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['reference_image', 'prompt']);
+    
+    const payload = {
+      prompt: options.prompt,
+      width: options.width || 1024,
+      height: options.height || 1024,
+      batch_size: options.batch_size || 1,
+      control_intensity: options.control_intensity ?? 0.5,
+      control_type: options.control_type || '0',
+      init_image: options.init_image,
+      reference_image: options.reference_image,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/open/capacity/application/tm_reference_img2img',
+      payload
+    );
+  }
+
+  /**
+   * 图片重绘
+   */
+  async redrawingImage(options: ImageRedrawingOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['image_url', 'prompt']);
+    
+    const payload = {
+      image_url: options.image_url,
+      mask_url: options.mask_url,
+      prompt: options.prompt,
+      strength: options.strength || 0.8,
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_image_redrawing',
+      payload
+    );
+  }
+
+  /**
+   * 图像识别
+   */
+  async recognizeImage(options: ImageRecognitionOptions): Promise<TaskResponse> {
+    validateRequiredFields(options, ['image_url']);
+    
+    const payload = {
+      image_url: options.image_url,
+      recognition_type: options.recognition_type || 'all',
+      callback: options.callback,
+      params: options.params
+    };
+
+    return this.http.post<TaskResponse>(
+      '/v1/ai/capacity/application/tm_image_recognition',
+      payload
+    );
+  }
+
+  // ==================== 通用方法 ====================
+
+  /**
+   * 获取任务状态
+   */
+  async getTaskStatus(task_id: string): Promise<TaskStatusResponse> {
+    // 使用统一任务查询接口
+    return this.http.post<TaskStatusResponse>(
+      '/v1/open/pub/task',
+      { task_id }
+    );
+  }
+
+  /**
+   * 轮询任务直到完成
+   */
+  async waitForTaskCompletion(
+    task_id: string,
+    maxAttempts: number = 60,
+    intervalMs: number = 5000
+  ): Promise<any> {
+    return this.http.pollTaskStatus(task_id, maxAttempts, intervalMs);
+  }
+
+  /**
+   * 上传文件
+   */
+  async uploadFile(file: Buffer | string, fileName: string): Promise<string> {
+    return this.http.uploadFile(file, fileName);
+  }
+
+  /**
+   * 批量处理任务
+   */
+  async batchProcess<T>(
+    tasks: Array<() => Promise<TaskResponse>>,
+    options: {
+      concurrent?: number;
+      pollInterval?: number;
+      onProgress?: (completed: number, total: number) => void;
+    } = {}
+  ): Promise<Array<{ task_id: string; result?: T; error?: string }>> {
+    const { concurrent = 3, pollInterval = 2000, onProgress } = options;
+    const results: Array<{ task_id: string; result?: T; error?: string }> = [];
+    
+    // 分批处理任务
+    for (let i = 0; i < tasks.length; i += concurrent) {
+      const batch = tasks.slice(i, i + concurrent);
+      
+      // 并发执行当前批次
+      const batchPromises = batch.map(async (task, index) => {
+        try {
+          const { task_id } = await task();
+          
+          // 等待任务完成
+          const result = await this.waitForTaskCompletion(task_id, undefined, pollInterval);
+          
+          results[i + index] = { task_id, result };
+        } catch (error) {
+          results[i + index] = { 
+            task_id: '', 
+            error: error instanceof Error ? error.message : String(error)
+          };
+        }
+      });
+      
+      await Promise.all(batchPromises);
+      
+      // 报告进度
+      if (onProgress) {
+        onProgress(Math.min(i + concurrent, tasks.length), tasks.length);
+      }
+    }
+    
+    return results;
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.opencode/
+nul
+*.log
+.DS_Store
+test-image.png
+video-task-id.txt
